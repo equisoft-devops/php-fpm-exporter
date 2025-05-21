@@ -1,3 +1,5 @@
 php-fpm-exporter.darwin.amd64
 php-fpm-exporter.linux.amd64
 *.sha256.txt
+php-fpm-exporter.darwin.arm64
+php-fpm-exporter.linux.arm64
