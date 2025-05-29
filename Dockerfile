@@ -1,10 +1,16 @@
-FROM       golang:alpine as builder
+# Multi-arch Dockerfile for php-fpm-exporter
+# Build with Buildx for linux/amd64 and linux/arm64
+FROM --platform=$BUILDPLATFORM golang:1.22-alpine AS builder
+
+ARG TARGETPLATFORM
+ARG TARGETARCH
 
 RUN apk --no-cache add bash make openssl
-COPY . /go/src/github.com/bakins/php-fpm-exporter
-RUN cd /go/src/github.com/bakins/php-fpm-exporter && ./script/build
+WORKDIR /src
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -o /php-fpm-exporter ./cmd/php-fpm-exporter
 
 FROM scratch
-COPY --from=builder /go/src/github.com/bakins/php-fpm-exporter/php-fpm-exporter.linux.amd64 /php-fpm-exporter
+COPY --from=builder /php-fpm-exporter /php-fpm-exporter
 
-ENTRYPOINT [ "/php-fpm-exporter" ]
+ENTRYPOINT ["/php-fpm-exporter"]
